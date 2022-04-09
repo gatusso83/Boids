@@ -34,8 +34,31 @@ case class SimulationFrame(boids:Seq[Boid]) {
     0d
 
   /** This function should calculate the next set of boids assuming there is no wind & no one-time functions applied */
-  def nextBoids:Seq[Boid] =
-    ???
+  def nextBoids:Seq[Boid] = {
+
+  // OMG FYI the reason I am so confused as we are looking at a class SimulationFrame, so we are building all the methods into it and therefore anywhere where there is
+  //a SimulationFrame(boids)... boids is used as the list of Boids throughout the methods here. 
+    
+    //boids.map(b => ((b._1.x + b._2.x, b._1.y + b._2.y),(b._2.x,b._2.y)))
+    //boids.map(a => ((a.position.x +(a.velocity.x), a.position.y +(a.velocity.y)),(a.velocity.x, a.velocity.y))):Seq[Boid]
+    val newb = boids.map(b => Boid(b.position + b.velocity, b.velocity))
+    println(newb)
+    newb
+
+   // boids.map((b:Boid => (b._1._1 +(b._2._1), b._1._2 + b._2._2,b._2._1,b._2._2))
+   // boids.map((b:Boid => Boid(b._1 +b._2, b._1._2 + b._2._2,b._2._1,b._2._2))
+
+    //boids.map((p,v) => (p._1 + p._2, p._1 + p._1),(v._1, v._2)
+    //boids.map((p, v) => ((p._1 + v._1, p._2 + v._2),v))
+    //https://stackoverflow.com/questions/24105479/scala-case-class-update-value
+    //boids.foreach(((p1, p1), (v1,v2)) => ((p1+v1), (p2+v2)))
+  
+    //boids.map(Boid(+(_2), Vec2.velocity))
+
+    /// have a look at map(_ * 2)
+    //SimulationFrame.currentFrame.map((position._1 + velocity._1, position._2 + velocity._2),velocity) 
+  }
+    // 
 
   /**
     *
@@ -44,14 +67,21 @@ case class SimulationFrame(boids:Seq[Boid]) {
     * @return
     */
   def nextFrame(wind:Option[Vec2] = None, oneTimeFunction:Option[Boid => Vec2] = None):SimulationFrame =
-    ???
-
+    val newBoids = SimulationFrame(nextBoids)
+    newBoids
 }
 
 object SimulationFrame {
 
   /** Generates boids in the centre of the simulation, moving at v=1 in a random direction */
-  def explosionOfBoids(i:Int):SimulationFrame =
-    ???
-  
+  def explosionOfBoids(i:Int):SimulationFrame = {
+    val startPos = Vec2(SimulationController.width/2, SimulationController.height/2)
+    println (SimulationFrame(Seq.fill(i)(Boid(startPos, Vec2.randomDir(1)))))
+    val boidss = (Seq.fill(i)(Boid(startPos, Vec2.randomDir(1))))
+    SimulationFrame(boidss)
+    //val currentFrame = SimulationFrame(Seq.fill(i)(Boid(startPos, Vec2.randomDir(1))))
+    //currentFrame
+  }  
+
+
 }

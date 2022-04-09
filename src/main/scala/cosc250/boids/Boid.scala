@@ -119,6 +119,7 @@ extension (boids:Seq[Boid]) {
     */
   def closeTo(p:Vec2, d:Double):Seq[Boid] =
     ???
+    // This should take the positions of each boid, determine if any are within the "desiredSeparation" 
 
   /**
     * Calculates the centroid of a group of boids.

@@ -1,6 +1,5 @@
 # Assignment 2: Boids
 
-test commit
 In a pure functional language, such as Haskell, the code is a pure (no side-effects) description of a program which is
 then run in a runtime environment.
 

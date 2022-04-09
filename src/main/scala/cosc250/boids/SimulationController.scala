@@ -15,7 +15,7 @@ object SimulationController {
   val frameMemoryLength = 60
 
   /** How many boids to start with in the simulation */
-  val numBoids = 150
+  val numBoids = 10//150
 
   /** When the wind is blowing, how strongly it blows */
   val windStrength = 0.03
@@ -54,7 +54,9 @@ object SimulationController {
   var frameMemory = FrameMemory(SimulationFrame.explosionOfBoids(numBoids), frameMemoryLength)
 
   /** The current frame */
-  def current:SimulationFrame = ???
+  def current:SimulationFrame = {
+    
+  }
 
   /** Called by a click to the canvas, to say that in the next frame, a boid should be inserted */
   def pushBoid(b:Boid):Unit = {
