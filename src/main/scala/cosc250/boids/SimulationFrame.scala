@@ -77,7 +77,7 @@ object SimulationFrame {
   def explosionOfBoids(i:Int):SimulationFrame = {
     val startPos = Vec2(SimulationController.width/2, SimulationController.height/2)
     println (SimulationFrame(Seq.fill(i)(Boid(startPos, Vec2.randomDir(1)))))
-    val boidss = (Seq.fill(i)(Boid(startPos, Vec2.randomDir(1))))
+    val boidss:Seq[Boid] = (Seq.fill(i)(Boid(startPos, Vec2.randomDir(1))))
     SimulationFrame(boidss)
     //val currentFrame = SimulationFrame(Seq.fill(i)(Boid(startPos, Vec2.randomDir(1))))
     //currentFrame

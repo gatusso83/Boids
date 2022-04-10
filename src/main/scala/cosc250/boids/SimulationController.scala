@@ -55,8 +55,9 @@ object SimulationController {
 
   /** The current frame */
   def current:SimulationFrame = {
-    
+    frameMemory.currentFrame
   }
+  
 
   /** Called by a click to the canvas, to say that in the next frame, a boid should be inserted */
   def pushBoid(b:Boid):Unit = {
@@ -70,7 +71,7 @@ object SimulationController {
 
   /** Progress to the next frame in the simulation */
   def update():Unit = {
-    ???
+   ???/// frameMemory += SimulationFrame.nextFrame
   }
 
   /** Force the simulation to use this as the next frame */
