@@ -10,12 +10,12 @@ case class SimulationFrame(boids:Seq[Boid]) {
 
   /** The current average direction of the flock. Add up all the boids' velocity vectors, and take the theta. */
   def flockDir:Double =
-    println("Warning, you haven't implemented flockDir!")
+    //println("Warning, you haven't implemented flockDir!")
     0d
 
   /** The current average speed of the flock. Take the mean of all the boids' velocity magnitudes. */
   def flockSpeed:Double =
-    println("Warning, you haven't implemented flockSpeed!")
+    //println("Warning, you haven't implemented flockSpeed!")
     0d
 
   /**
@@ -30,7 +30,7 @@ case class SimulationFrame(boids:Seq[Boid]) {
     * on the screen looks right!
     */
   def flockSep:Double =
-    println("Warning, you haven't implemented flockSep!")
+    //println("Warning, you haven't implemented flockSep!")
     0d
 
   /** This function should calculate the next set of boids assuming there is no wind & no one-time functions applied */
@@ -42,7 +42,7 @@ case class SimulationFrame(boids:Seq[Boid]) {
     //boids.map(b => ((b._1.x + b._2.x, b._1.y + b._2.y),(b._2.x,b._2.y)))
     //boids.map(a => ((a.position.x +(a.velocity.x), a.position.y +(a.velocity.y)),(a.velocity.x, a.velocity.y))):Seq[Boid]
     val newb = boids.map(b => Boid(b.position + b.velocity, b.velocity))
-    println(newb)
+    //println(newb)
     newb
 
    // boids.map((b:Boid => (b._1._1 +(b._2._1), b._1._2 + b._2._2,b._2._1,b._2._2))
@@ -56,7 +56,8 @@ case class SimulationFrame(boids:Seq[Boid]) {
     //boids.map(Boid(+(_2), Vec2.velocity))
 
     /// have a look at map(_ * 2)
-    //SimulationFrame.currentFrame.map((position._1 + velocity._1, position._2 + velocity._2),velocity) 
+    
+
   }
     // 
 
@@ -76,11 +77,10 @@ object SimulationFrame {
   /** Generates boids in the centre of the simulation, moving at v=1 in a random direction */
   def explosionOfBoids(i:Int):SimulationFrame = {
     val startPos = Vec2(SimulationController.width/2, SimulationController.height/2)
-    println (SimulationFrame(Seq.fill(i)(Boid(startPos, Vec2.randomDir(1)))))
+    //println (SimulationFrame(Seq.fill(i)(Boid(startPos, Vec2.randomDir(1)))))
     val boidss:Seq[Boid] = (Seq.fill(i)(Boid(startPos, Vec2.randomDir(1))))
     SimulationFrame(boidss)
-    //val currentFrame = SimulationFrame(Seq.fill(i)(Boid(startPos, Vec2.randomDir(1))))
-    //currentFrame
+    
   }  
 
 

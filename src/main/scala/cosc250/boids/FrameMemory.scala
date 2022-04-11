@@ -20,9 +20,12 @@ class FrameMemory(queue:Queue[SimulationFrame], max:Int) {
   
 
   def oldestFrame:SimulationFrame =
-    this.queue.last
+    this.queue.front
 
-  def pushFrame(frame:SimulationFrame):FrameMemory = ???
+  def pushFrame(frame:SimulationFrame):FrameMemory = {
+    val newQ = queue.enqueue(frame)
+    FrameMemory(newQ,max)    
+  }
     // Don't forget to dequeue old frames if it's getting too long.
     
     
