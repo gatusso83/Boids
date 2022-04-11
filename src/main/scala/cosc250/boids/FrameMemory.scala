@@ -23,13 +23,15 @@ class FrameMemory(queue:Queue[SimulationFrame], max:Int) {
     this.queue.front
 
   def pushFrame(frame:SimulationFrame):FrameMemory = {
-    val newQ = queue.enqueue(frame)
-    FrameMemory(newQ,max)    
+    if (this.queue.length == max) {
+      val deQ = queue.dequeue
+      val newQ = deQ._2.enqueue(frame)
+      FrameMemory(newQ,max)
+    }
+    else {
+      val newQ = queue.enqueue(frame)
+      FrameMemory(newQ,max) 
+    }
   }
     // Don't forget to dequeue old frames if it's getting too long.
-    
-    
-    //this.queue += frame
-    //There is a some information about dequeue here: https://www.handsonscala.com/chapter-4-scala-collections.html
-
 }
