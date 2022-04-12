@@ -28,7 +28,15 @@ object SimulationController {
     * Note that a northerly wind blows **from** the north, so we multiply the vector by -1.
     */
   def setWindDirection(theta:Double):Unit = {
-    ???
+    theta match
+      case Vec2.E => Vec2.fromRTheta(windStrength, 180)
+      case Vec2.NE => Vec2.fromRTheta(windStrength, 225)
+      case Vec2.N => Vec2.fromRTheta(windStrength, 270)
+      case Vec2.NW => Vec2.fromRTheta(windStrength, 315)
+      case Vec2.W => Vec2.fromRTheta(windStrength, 0)
+      case Vec2.SW => Vec2.fromRTheta(windStrength, 45)
+      case Vec2.S => Vec2.fromRTheta(windStrength, 90)
+      case Vec2.SE => Vec2.fromRTheta(windStrength, 135)
   }
 
   /** A container that can hold a boid to add on the next frame */
@@ -39,7 +47,7 @@ object SimulationController {
     * producing an acceleration vector to add to a Boid
     */
   var oneTimeFunction:Option[Boid => Vec2] = None
-
+    
   /**
     * Resets the events that should occur one time only
     */
@@ -63,9 +71,9 @@ object SimulationController {
     insertBoid = Some(b)
   }
 
-  /** Called by the Action Replay button to jump back in the memory buffer */
-  def resetQueue():Seq[Boid] = {
-    ???
+  /** Called by the Action Replay button to jump back in the memory buffer */  //Change type from Seq[Boid] to Unit as per Will's Response 
+  def resetQueue():Unit = {
+    SimulationController.pushFrame(frameMemory.oldestFrame)
   }
 
   /** Progress to the next frame in the simulation */
