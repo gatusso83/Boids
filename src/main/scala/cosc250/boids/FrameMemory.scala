@@ -17,7 +17,6 @@ class FrameMemory(queue:Queue[SimulationFrame], max:Int) {
     this.queue.last
   }
     // Remember, items join queues at the back.
-  
 
   def oldestFrame:SimulationFrame =
     this.queue.front
@@ -25,12 +24,10 @@ class FrameMemory(queue:Queue[SimulationFrame], max:Int) {
   def pushFrame(frame:SimulationFrame):FrameMemory = {
     if (this.queue.length == max) {
       val deQ = queue.dequeue
-      val newQ = deQ._2.enqueue(frame)
-      FrameMemory(newQ,max)
+      FrameMemory(deQ._2.enqueue(frame),max)
     }
     else {
-      val newQ = queue.enqueue(frame)
-      FrameMemory(newQ,max) 
+      FrameMemory(queue.enqueue(frame),max) 
     }
   }
     // Don't forget to dequeue old frames if it's getting too long.

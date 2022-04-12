@@ -35,7 +35,9 @@ case class SimulationFrame(boids:Seq[Boid]) {
 
   /** This function should calculate the next set of boids assuming there is no wind & no one-time functions applied */
   def nextBoids:Seq[Boid] = {
-    boids.map(b => Boid(b.position + b.velocity, b.velocity))   
+     boids.map(boid => 
+       val bPos= Vec2(boid.wrapX(boid.position.x+boid.velocity.x),boid.wrapY(boid.position.y+boid.velocity.y)) // Updated position with boundary wrapper
+       Boid(bPos,boid.velocity))
   }
 
   /**
