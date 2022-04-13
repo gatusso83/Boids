@@ -47,7 +47,19 @@ case class SimulationFrame(boids:Seq[Boid]) {
     * @return
     */
   def nextFrame(wind:Option[Vec2] = None, oneTimeFunction:Option[Boid => Vec2] = None):SimulationFrame =
-    SimulationFrame(nextBoids)
+    wind match {
+      case Some(wind) => 
+        println("WIND: " + wind)
+        
+          SimulationFrame(nextBoids.map(boid => Boid((boid.position + boid.velocity),boid.velocity + wind  )))
+          println(SimulationFrame(nextBoids.map(boid => Boid((boid.position + boid.velocity),wind + boid.velocity)))) // Not working as intended
+          
+      case None => SimulationFrame(nextBoids.map(boid => Boid((boid.position + boid.velocity), boid.velocity)))
+      println("None: "+SimulationFrame(nextBoids.map(boid => Boid((boid.position + boid.velocity), boid.velocity))))
+    }
+    oneTimeFunction match {
+      case None => SimulationFrame(nextBoids)
+    }
 }
 
 object SimulationFrame {

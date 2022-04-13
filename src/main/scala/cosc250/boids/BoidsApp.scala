@@ -114,6 +114,7 @@ object BoidsApp {
 
     boidsPanel.addMouseListener(new MouseAdapter {
       override def mouseClicked(e: MouseEvent):Unit = {
+        println("CLicked")
         SimulationController.pushBoid(Boid(Vec2(e.getX, e.getY), Vec2.randomDir(1)))
       }
     })
