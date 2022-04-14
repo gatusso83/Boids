@@ -18,7 +18,7 @@ object SimulationController {
   val numBoids = 4//150
 
   /** When the wind is blowing, how strongly it blows */
-  val windStrength = 100//0.03
+  val windStrength = 0.03
 
   /** The wind -- an optional acceleration vector */
   var wind:Option[Vec2] = None
@@ -28,7 +28,7 @@ object SimulationController {
     * Note that a northerly wind blows **from** the north, so we multiply the vector by -1.
     */
   def setWindDirection(theta:Double):Unit = {
-    wind = Option(Vec2.fromRTheta(windStrength, theta))   
+    wind = Option(Vec2.fromRTheta(windStrength, -theta))   
   }
 
   /** A container that can hold a boid to add on the next frame */

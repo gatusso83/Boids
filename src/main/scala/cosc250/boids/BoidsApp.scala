@@ -110,6 +110,7 @@ object BoidsApp {
 
     regenesis.addActionListener({ (evt) =>
       SimulationController.pushFrame(SimulationFrame.explosionOfBoids(SimulationController.numBoids))
+      SimulationController.wind = None
     })
 
     boidsPanel.addMouseListener(new MouseAdapter {

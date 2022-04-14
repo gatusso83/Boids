@@ -47,7 +47,21 @@ case class SimulationFrame(boids:Seq[Boid]) {
     * @return
     */
   def nextFrame(wind:Option[Vec2] = None, oneTimeFunction:Option[Boid => Vec2] = None):SimulationFrame =
-    wind match {
+    (wind, oneTimeFunction) match
+      case (Some(wind), None) => SimulationFrame(nextBoids.map(boid => 
+                if (boid.velocity.magnitude + wind.magnitude > Boid.maxSpeed + wind.magnitude ) { 
+                  Boid((boid.position + boid.velocity), boid.velocity)
+                }
+                else {
+                  Boid((boid.position + boid.velocity),boid.velocity + wind  )
+                }
+      ))
+                //Boid((boid.position + boid.velocity), boidVel)))
+                //val windAndVel = boid.velocity + wind
+                //Boid((boid.position + boid.velocity),boid.velocity + wind  )))
+      case (None, None) => SimulationFrame(nextBoids)
+    
+    /*wind match {
       case Some(wind) => 
         println("WIND: " + wind)
         
@@ -59,7 +73,8 @@ case class SimulationFrame(boids:Seq[Boid]) {
     }
     oneTimeFunction match {
       case None => SimulationFrame(nextBoids)
-    }
+    }*/
+  
 }
 
 object SimulationFrame {
