@@ -117,8 +117,9 @@ extension (boids:Seq[Boid]) {
     * Returns only those boids within d distance of position p
     * align, separate, and cohesion all want to consider boids within a certain range.
     */
-  def closeTo(p:Vec2, d:Double):Seq[Boid] =
-    ???
+  def closeTo(p:Vec2, d:Double):Seq[Boid] = 
+    boids.filter(boid => Math.abs((boid.position - p).magnitude) < d)
+
     // This should take the positions of each boid, determine if any are within the "desiredSeparation" 
 
   /**
@@ -126,13 +127,15 @@ extension (boids:Seq[Boid]) {
     * Cohesion asks a boid to steer towards the centroid of the boids within a certain distance
     */
   def centroid:Vec2 =
-    ???
+    boids.foldLeft(boids(0).position){(acc, boidPos) =>
+      acc + boidPos.position}/boids.length
 
   /**
     * Calculates the average velocity vector (add them up and divide by the number in the group) of a group of boids
     * Align asks a boid to steer so it will align more with its neighbours' average velocity vector
     */
   def averageVelocity:Vec2 =
-    ???
+    boids.foldLeft(boids(0).velocity){(acc, boidVel) =>
+      acc + boidVel.velocity}/boids.length
 
 }
