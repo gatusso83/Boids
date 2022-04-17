@@ -36,8 +36,11 @@ case class SimulationFrame(boids:Seq[Boid]) {
   /** This function should calculate the next set of boids assuming there is no wind & no one-time functions applied */
   def nextBoids:Seq[Boid] = {
      boids.map(boid => 
-       val updatedPos= Vec2(boid.wrapX(boid.position.x + boid.velocity.x), boid.wrapY(boid.position.y + boid.velocity.y)) // Updated position with boundary wrapper
-       Boid(updatedPos, boid.velocity))
+       //val updatedPos= Vec2(boid.wrapX(boid.position.x + boid.velocity.x), boid.wrapY(boid.position.y + boid.velocity.y)) // Updated position with boundary wrapper
+       // Boid(updatedPos,boid.velocity)
+       println("do I get here")
+       println(boid.update(boid.flock(boids),SimulationController.wind.get))
+       boid.update(boid.flock(boids),SimulationController.wind.get))
   }
 
   /**
@@ -60,6 +63,7 @@ case class SimulationFrame(boids:Seq[Boid]) {
                 //val windAndVel = boid.velocity + wind
                 //Boid((boid.position + boid.velocity),boid.velocity + wind  )))
       case (None, None) => SimulationFrame(nextBoids)
+                
     
     /*wind match {
       case Some(wind) => 
@@ -82,6 +86,7 @@ object SimulationFrame {
   /** Generates boids in the centre of the simulation, moving at v=1 in a random direction */
   def explosionOfBoids(i:Int):SimulationFrame = {
     val startPos = Vec2(SimulationController.width/2, SimulationController.height/2)
+    println(SimulationFrame(Seq.fill(i)(Boid(startPos, Vec2.randomDir(1)))))
     SimulationFrame(Seq.fill(i)(Boid(startPos, Vec2.randomDir(1))))
   }  
 

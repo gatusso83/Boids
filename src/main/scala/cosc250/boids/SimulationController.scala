@@ -74,7 +74,6 @@ object SimulationController {
   def update():Unit = {    
     SimulationController.pushFrame(current.nextFrame(wind,oneTimeFunction))
     resetOneTimeEvents()
-    println("Wind in update: "+wind)
   }
 
   /** Force the simulation to use this as the next frame */

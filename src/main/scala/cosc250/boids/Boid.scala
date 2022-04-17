@@ -16,7 +16,7 @@ case class Boid(
     * This steer is limited to maxForce
     */
   def separate(others:Seq[Boid]):Vec2 = {
-    ???
+    averageVelocity(others.closeTo(this.position, Boid.desiredSeparation))
   }
 
   /**
@@ -25,7 +25,7 @@ case class Boid(
     * This alignment force is limited to maxForce
     */
   def align(others:Seq[Boid]):Vec2 = {
-    ???
+    averageVelocity(others.closeTo(this.position, Boid.neighBourDist))
   }
 
   /**
@@ -33,7 +33,10 @@ case class Boid(
     * The steer is limited to maxForce
     */
   def seek(targetPos:Vec2):Vec2 = {
-    ???
+    val desired = targetPos - this.position
+    //if this.velocity >= Boid.maxSpeed then
+      //yield maxSpeed
+      desired
   }
 
 
@@ -51,7 +54,11 @@ case class Boid(
     * align, and cohesion acceleration vectors.
     */
   def flock(others:Seq[Boid]):Vec2 = {
-    ???
+    val acceleration = align(others) - separate(others) //+ cohesion(others) 
+    if acceleration.magnitude > Boid.maxForce then
+      acceleration.limit(acceleration.magnitude)
+    else 
+      acceleration
   }
 
   /**
@@ -69,7 +76,10 @@ case class Boid(
     * to fly faster downwind than upwind.
     */
   def update(acceleration:Vec2, wind:Vec2):Boid = {
-    ???
+    val updatedPos = Vec2(wrapX(this.position.x + this.velocity.x),wrapY(this.position.y + this.velocity.y))
+    println("What about here")
+    Boid(updatedPos,(this.velocity + acceleration))
+
   }
 
   def wrapX(x:Double):Double = {
