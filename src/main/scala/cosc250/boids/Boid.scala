@@ -16,7 +16,11 @@ case class Boid(
     * This steer is limited to maxForce
     */
   def separate(others:Seq[Boid]):Vec2 = {
-    averageVelocity(others.closeTo(this.position, Boid.desiredSeparation))
+    val accVec = averageVelocity(others.closeTo(this.position, Boid.desiredSeparation))
+    if (accVec.magnitude > Boid.maxForce)
+      accVec.limit(Boid.maxForce)
+    else 
+      accVec
   }
 
   /**
@@ -25,7 +29,11 @@ case class Boid(
     * This alignment force is limited to maxForce
     */
   def align(others:Seq[Boid]):Vec2 = {
-    averageVelocity(others.closeTo(this.position, Boid.neighBourDist))
+    val accVec = averageVelocity(others.closeTo(this.position, Boid.neighBourDist))
+    if (accVec.magnitude > Boid.maxForce)
+      accVec.limit(Boid.maxForce)
+    else 
+      accVec
   }
 
   /**
@@ -45,7 +53,11 @@ case class Boid(
     * the flock cohesion
     */
   def cohesion(others:Seq[Boid]):Vec2 = {
-    ???
+    val accVec = seek(others.centroid)
+    if (accVec.magnitude > Boid.maxForce)
+      accVec.limit(Boid.maxForce)
+    else 
+      accVec
   }
 
 
@@ -54,7 +66,7 @@ case class Boid(
     * align, and cohesion acceleration vectors.
     */
   def flock(others:Seq[Boid]):Vec2 = {
-    val acceleration = align(others) - separate(others) //+ cohesion(others) 
+    val acceleration = align(others) - separate(others) + cohesion(others) 
     if acceleration.magnitude > Boid.maxForce then
       acceleration.limit(acceleration.magnitude)
     else 
@@ -76,9 +88,14 @@ case class Boid(
     * to fly faster downwind than upwind.
     */
   def update(acceleration:Vec2, wind:Vec2):Boid = {
+    val updatedAcceleration:Vec2 = this.velocity + acceleration
     val updatedPos = Vec2(wrapX(this.position.x + this.velocity.x),wrapY(this.position.y + this.velocity.y))
-    println("What about here")
-    Boid(updatedPos,(this.velocity + acceleration))
+    if (this.velocity.magnitude > Boid.maxSpeed)
+      Boid(updatedPos, updatedAcceleration.limit(updatedAcceleration.magnitude ))
+      // Boid(updatedPos.limit(updatedPos.magnitude),(this.velocity + acceleration + wind))
+    else
+    //println("What about here")
+      Boid(updatedPos,(this.velocity + acceleration + wind ))
 
   }
 
@@ -137,15 +154,18 @@ extension (boids:Seq[Boid]) {
     * Cohesion asks a boid to steer towards the centroid of the boids within a certain distance
     */
   def centroid:Vec2 =
-    boids.foldLeft(boids(0).position){(acc, boidPos) =>
+    boids.foldLeft(Vec2(0,0)){(acc, boidPos) =>
       acc + boidPos.position}/boids.length
+
+    //boids.foldLeft(boids(0).position){(acc, boidPos) =>
+      //acc + boidPos.position}/boids.length
 
   /**
     * Calculates the average velocity vector (add them up and divide by the number in the group) of a group of boids
     * Align asks a boid to steer so it will align more with its neighbours' average velocity vector
     */
   def averageVelocity:Vec2 =
-    boids.foldLeft(boids(0).velocity){(acc, boidVel) =>
+    boids.foldLeft(Vec2(0,0)){(acc, boidVel) =>
       acc + boidVel.velocity}/boids.length
 
 }

@@ -12,17 +12,18 @@ class BoidSuite extends munit.FunSuite {
   // A place for you to write tests. Some suggested tests to start with have been sketched below
 
   // Let's start with the extension methods closeTo, centroid and averageVelocity on Seq[Boid]...
+  val testBoids:Seq[Boid] = Seq(Boid(Vec2(10,10),Vec2(1,1)),Boid(Vec2(20,20),Vec2(2,2)),Boid(Vec2(30,30),Vec2(3,3)))
 
   test("Seq[Boid] should be able to filter just those close to a certain point") {
-    ???
+    assertEquals(testBoids.closeTo(Vec2(0,0), 40), Seq(Boid(Vec2(10,10),Vec2(1,1)),Boid(Vec2(20,20),Vec2(2,2))))
   }
 
   test("Seq[Boid] should be able to calculate its centroid") {
-    ???
+    assertEquals(testBoids.centroid, Vec2(20,20))
   }
 
   test("Seq[Boid] should be able to calculate its average velocity") {
-    ???
+    assertEquals(testBoids.averageVelocity, Vec2(2,2))
   }
 
 

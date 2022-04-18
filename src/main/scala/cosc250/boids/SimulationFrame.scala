@@ -36,11 +36,11 @@ case class SimulationFrame(boids:Seq[Boid]) {
   /** This function should calculate the next set of boids assuming there is no wind & no one-time functions applied */
   def nextBoids:Seq[Boid] = {
      boids.map(boid => 
-       //val updatedPos= Vec2(boid.wrapX(boid.position.x + boid.velocity.x), boid.wrapY(boid.position.y + boid.velocity.y)) // Updated position with boundary wrapper
-       // Boid(updatedPos,boid.velocity)
-       println("do I get here")
-       println(boid.update(boid.flock(boids),SimulationController.wind.get))
-       boid.update(boid.flock(boids),SimulationController.wind.get))
+       val updatedPos= Vec2(boid.wrapX(boid.position.x + boid.velocity.x), boid.wrapY(boid.position.y + boid.velocity.y)) // Updated position with boundary wrapper
+        Boid(updatedPos,boid.velocity))
+       //println("do I get here")
+       //println(boid.update(boid.flock(boids), SimulationController.wind.g))
+       //boid.update(boid.flock(boids), SimulationController.wind))
   }
 
   /**
@@ -62,7 +62,9 @@ case class SimulationFrame(boids:Seq[Boid]) {
                 //Boid((boid.position + boid.velocity), boidVel)))
                 //val windAndVel = boid.velocity + wind
                 //Boid((boid.position + boid.velocity),boid.velocity + wind  )))
-      case (None, None) => SimulationFrame(nextBoids)
+      case (None, None) => SimulationFrame(nextBoids.map(boid =>
+        println(boid.update(boid.flock(boids), Vec2(1,1))) //SimulationFrame(nextBoids)
+                boid.update(boid.flock(boids), Vec2(1,1))))
                 
     
     /*wind match {
