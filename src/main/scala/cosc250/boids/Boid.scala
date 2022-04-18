@@ -15,12 +15,15 @@ case class Boid(
     * separation from its closest neighbours
     * This steer is limited to maxForce
     */
-  def separate(others:Seq[Boid]):Vec2 = {
-    val accVec = averageVelocity(others.closeTo(this.position, Boid.desiredSeparation))
-    if (accVec.magnitude > Boid.maxForce)
-      accVec.limit(Boid.maxForce)
-    else 
-      accVec
+  def separate(others:Seq[Boid]):Vec2 = { // This one is somewhat done
+    val othersClose = others.closeTo(this.position, Boid.desiredSeparation) 
+    val seqDiff = othersClose.map(boid => ((this.position - boid.position).normalised/(this.position - boid.position).magnitude)).foldLeft(Vec2(0,0)){(a, b) => (a + b)} // I think b is then end
+    val seekVal = seek(seqDiff /(othersClose.length))
+
+    if seekVal.magnitude > 0 then
+      (seekVal.normalised * Boid.maxSpeed - this.velocity).limit(Boid.maxForce)
+    else
+      seekVal
   }
 
   /**
@@ -28,23 +31,24 @@ case class Boid(
     * velocity with other birds within Boid.neighbourDist
     * This alignment force is limited to maxForce
     */
-  def align(others:Seq[Boid]):Vec2 = {
-    val accVec = averageVelocity(others.closeTo(this.position, Boid.neighBourDist))
-    if (accVec.magnitude > Boid.maxForce)
-      accVec.limit(Boid.maxForce)
-    else 
-      accVec
+  def align(others:Seq[Boid]):Vec2 = { // Complete....
+    val othersClose = others.closeTo(this.position, Boid.neighBourDist)
+    if (!othersClose.isEmpty) {
+      val avgVel = othersClose.averageVelocity.limit(Boid.maxSpeed)
+      seek(avgVel - this.velocity).limit(Boid.maxForce)
+    }
+    else {
+      Vec2(0,0)
+    }
   }
 
   /**
     * Calculates an acceleration that will steer this boid towards the target.
     * The steer is limited to maxForce
     */
-  def seek(targetPos:Vec2):Vec2 = {
+  def seek(targetPos:Vec2):Vec2 = { // Seek is done
     val desired = targetPos - this.position
-    //if this.velocity >= Boid.maxSpeed then
-      //yield maxSpeed
-      desired
+    (desired.normalised * Boid.maxSpeed - this.velocity).limit(Boid.maxForce)
   }
 
 
@@ -53,11 +57,11 @@ case class Boid(
     * the flock cohesion
     */
   def cohesion(others:Seq[Boid]):Vec2 = {
-    val accVec = seek(others.centroid)
-    if (accVec.magnitude > Boid.maxForce)
-      accVec.limit(Boid.maxForce)
-    else 
-      accVec
+    val othersClose = others.closeTo(this.position, Boid.neighBourDist)
+    if (!othersClose.isEmpty) then
+      othersClose.averageVelocity
+    else
+      Vec2(0,0) 
   }
 
 
@@ -66,10 +70,10 @@ case class Boid(
     * align, and cohesion acceleration vectors.
     */
   def flock(others:Seq[Boid]):Vec2 = {
-    val acceleration = align(others) - separate(others) + cohesion(others) 
-    if acceleration.magnitude > Boid.maxForce then
-      acceleration.limit(acceleration.magnitude)
-    else 
+    val acceleration = align(others)* 0.05 + separate(others)*10 + cohesion(others) *0.05
+    //if acceleration.magnitude > Boid.maxForce then 
+   //   acceleration.limit(acceleration.magnitude)
+   // else 
       acceleration
   }
 
@@ -88,15 +92,9 @@ case class Boid(
     * to fly faster downwind than upwind.
     */
   def update(acceleration:Vec2, wind:Vec2):Boid = {
-    val updatedAcceleration:Vec2 = this.velocity + acceleration
-    val updatedPos = Vec2(wrapX(this.position.x + this.velocity.x),wrapY(this.position.y + this.velocity.y))
-    if (this.velocity.magnitude > Boid.maxSpeed)
-      Boid(updatedPos, updatedAcceleration.limit(updatedAcceleration.magnitude ))
-      // Boid(updatedPos.limit(updatedPos.magnitude),(this.velocity + acceleration + wind))
-    else
-    //println("What about here")
-      Boid(updatedPos,(this.velocity + acceleration + wind ))
-
+    val updatedVelocity:Vec2 = (this.velocity + acceleration).limit(Boid.maxSpeed)
+    val updatedPos = Vec2(wrapX(this.position.x +updatedVelocity.x),wrapY(this.position.y + updatedVelocity.y))
+    Boid(updatedPos, updatedVelocity + wind)
   }
 
   def wrapX(x:Double):Double = {
