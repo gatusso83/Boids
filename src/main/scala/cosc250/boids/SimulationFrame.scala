@@ -38,13 +38,8 @@ case class SimulationFrame(boids:Seq[Boid]) {
         Boid(Vec2(boid.wrapX(boid.position.x + boid.velocity.x), boid.wrapY(boid.position.y + boid.velocity.y)),boid.velocity)))
      
      boids.map(boid =>
-       val updatedPos= Vec2((boid.position.x + boid.velocity.x), (boid.position.y + boid.velocity.y))
-        
-        Boid(updatedPos,boid.velocity))     //boids.map(boid =>
-     //  val updatedPos= Vec2(boid.wrapX(boid.position.x + boid.velocity.x), boid.wrapY(boid.position.y + boid.velocity.y))
-        
-      //  Boid(updatedPos,boid.velocity))
-
+        val updatedPos= Vec2((boid.position.x + boid.velocity.x), (boid.position.y + boid.velocity.y))
+        Boid(updatedPos,boid.velocity))     
   }
 
   /**
@@ -55,40 +50,10 @@ case class SimulationFrame(boids:Seq[Boid]) {
     */
   def nextFrame(wind:Option[Vec2] = None, oneTimeFunction:Option[Boid => Vec2] = None):SimulationFrame =
     (wind, oneTimeFunction) match
-      case (Some(wind), None) => SimulationFrame(nextBoids.map(boid => 
-                if (boid.velocity.magnitude + wind.magnitude > Boid.maxSpeed + wind.magnitude ) { 
-                  Boid((boid.position + boid.velocity), boid.velocity)
-                }
-                else {
-                  Boid((boid.position + boid.velocity),boid.velocity + wind  )
-                }
-      ))
-                //Boid((boid.position + boid.velocity), boidVel)))
-                //val windAndVel = boid.velocity + wind
-                //Boid((boid.position + boid.velocity),boid.velocity + wind  )))
-      case (None, None) => println("Next Boids: "+ SimulationFrame(nextBoids.map(boid =>
-        //println("\n"+boid.update(boid.flock(boids), Vec2(1,1))) //SimulationFrame(nextBoids)
-                boid.update(boid.flock(boids), Vec2(0,0))))+"\n")
-        
-        SimulationFrame(nextBoids.map(boid =>
-        //println("\n"+boid.update(boid.flock(boids), Vec2(1,1))) //SimulationFrame(nextBoids)
-                boid.update(boid.flock(boids), Vec2(0,0))))
-                
-    
-    /*wind match {
-      case Some(wind) => 
-        println("WIND: " + wind)
-        
-          SimulationFrame(nextBoids.map(boid => Boid((boid.position + boid.velocity),boid.velocity + wind  )))
-          println(SimulationFrame(nextBoids.map(boid => Boid((boid.position + boid.velocity),wind + boid.velocity)))) // Not working as intended
-          
-      case None => SimulationFrame(nextBoids.map(boid => Boid((boid.position + boid.velocity), boid.velocity)))
-      println("None: "+SimulationFrame(nextBoids.map(boid => Boid((boid.position + boid.velocity), boid.velocity))))
-    }
-    oneTimeFunction match {
-      case None => SimulationFrame(nextBoids)
-    }*/
-  
+      case (None, None) => SimulationFrame(nextBoids.map(boid => boid.update(boid.flock(boids), Vec2(0,0))))
+      case (Some(wind), None) => SimulationFrame(nextBoids.map(boid => boid.update(boid.flock(boids), wind)))
+      case (None, Some(oneTimeFunction)) => SimulationFrame(nextBoids.map(boid => boid.update(boid.flock(boids), Vec2(0,0))))   
+      case (Some(wind), Some(oneTimeFunction)) => SimulationFrame(nextBoids.map(boid => boid.update(boid.flock(boids), wind)))      
 }
 
 object SimulationFrame {

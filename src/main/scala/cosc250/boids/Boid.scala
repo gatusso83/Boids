@@ -21,9 +21,9 @@ case class Boid(
     val seekVal = seek(seqDiff /(othersClose.length))
 
     if seekVal.magnitude > 0 then
-      (seekVal.normalised * Boid.maxSpeed - this.velocity).limit(Boid.maxForce)
+      (seekVal.normalised * Boid.maxSpeed - this.velocity).limit(Boid.maxForce) * -1
     else
-      seekVal
+      seekVal * -10
   }
 
   /**
@@ -70,10 +70,7 @@ case class Boid(
     * align, and cohesion acceleration vectors.
     */
   def flock(others:Seq[Boid]):Vec2 = {
-    val acceleration = align(others)* 0.05 + separate(others)*10 + cohesion(others) *0.05
-    //if acceleration.magnitude > Boid.maxForce then 
-   //   acceleration.limit(acceleration.magnitude)
-   // else 
+    val acceleration = separate(others) + cohesion(others) + align(others)
       acceleration
   }
 

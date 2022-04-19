@@ -15,7 +15,7 @@ object SimulationController {
   val frameMemoryLength = 60
 
   /** How many boids to start with in the simulation */
-  val numBoids = 20//150
+  val numBoids = 2//150
 
   /** When the wind is blowing, how strongly it blows */
   val windStrength = 0.03
@@ -28,7 +28,7 @@ object SimulationController {
     * Note that a northerly wind blows **from** the north, so we multiply the vector by -1.
     */
   def setWindDirection(theta:Double):Unit = {
-    wind = Option(Vec2.fromRTheta(windStrength, -theta))   
+    wind = Option(Vec2.fromRTheta(windStrength, theta) * -1)
   }
 
   /** A container that can hold a boid to add on the next frame */
@@ -74,6 +74,7 @@ object SimulationController {
   def update():Unit = {    
     SimulationController.pushFrame(current.nextFrame(wind,oneTimeFunction))
     resetOneTimeEvents()
+    wind = None
   }
 
   /** Force the simulation to use this as the next frame */
