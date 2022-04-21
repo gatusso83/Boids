@@ -10,13 +10,12 @@ case class SimulationFrame(boids:Seq[Boid]) {
 
   /** The current average direction of the flock. Add up all the boids' velocity vectors, and take the theta. */
   def flockDir:Double =
-    //println("Warning, you haven't implemented flockDir!")
-    0d
+    boids.averageVelocity.theta.round
 
   /** The current average speed of the flock. Take the mean of all the boids' velocity magnitudes. */
   def flockSpeed:Double =
-    //println("Warning, you haven't implemented flockSpeed!")
-    0d
+    boids.averageVelocity.magnitude.round
+    
 
   /**
     * The variance of the flock's positions, ignoring the fact we wrap around the screen.
@@ -29,19 +28,23 @@ case class SimulationFrame(boids:Seq[Boid]) {
     * We'll probably eyeball the code for this one, given we're going to find it harder to eyeball whether the number
     * on the screen looks right!
     */
-  def flockSep:Double =
-    //println("Warning, you haven't implemented flockSep!")
-    0d
+  def flockSep:Double = {
+    val cent = boids.foldLeft(Vec2(0,0)){(acc, boidPos) =>
+      acc + boidPos.position}/boids.length
+      
+    val squareDist = boids.map(boid => Math.pow((boid.position - cent).magnitude,2))
+    val res = squareDist.foldLeft(0.0){((a,b) => a + b)}/squareDist.length
+    res.round
+    }
+  
 
   /** This function should calculate the next set of boids assuming there is no wind & no one-time functions applied */
-  def nextBoids:Seq[Boid] = {println("Updated boids: "+ boids.map(boid =>        
-        Boid(Vec2(boid.wrapX(boid.position.x + boid.velocity.x), boid.wrapY(boid.position.y + boid.velocity.y)),boid.velocity)))
-     
-     boids.map(boid =>
-        val updatedPos= Vec2((boid.position.x + boid.velocity.x), (boid.position.y + boid.velocity.y))
-        Boid(updatedPos,boid.velocity))     
-  }
-
+  def nextBoids:Seq[Boid] = { 
+    boids.map(boid => SimulationController.wind match
+      case None => (boid.update(boid.flock(boids), Vec2(0,0)))
+      case Some(wind) => boid.update(boid.flock(boids), SimulationController.wind.get))
+    }
+      
   /**
     *
     * @param wind - a force applied to every boid. We've called it "wind" but in practice, it'll steer the flock.
@@ -50,10 +53,10 @@ case class SimulationFrame(boids:Seq[Boid]) {
     */
   def nextFrame(wind:Option[Vec2] = None, oneTimeFunction:Option[Boid => Vec2] = None):SimulationFrame =
     (wind, oneTimeFunction) match
-      case (None, None) => SimulationFrame(nextBoids.map(boid => boid.update(boid.flock(boids), Vec2(0,0))))
-      case (Some(wind), None) => SimulationFrame(nextBoids.map(boid => boid.update(boid.flock(boids), wind)))
-      case (None, Some(oneTimeFunction)) => SimulationFrame(nextBoids.map(boid => boid.update(boid.flock(boids), Vec2(0,0))))   
-      case (Some(wind), Some(oneTimeFunction)) => SimulationFrame(nextBoids.map(boid => boid.update(boid.flock(boids), wind)))      
+      case (None, None) => SimulationFrame(nextBoids)
+      case (Some(wind), None) => SimulationFrame(nextBoids.map(boid => Boid(boid.position, boid.velocity + wind)))
+      case (None, Some(oneTimeFunction)) => SimulationFrame(nextBoids.map(boid => Boid(boid.position, boid.velocity + oneTimeFunction(boid))))  
+      case (Some(wind), Some(oneTimeFunction)) => SimulationFrame(nextBoids.map(boid => Boid(boid.position, boid.velocity + oneTimeFunction(boid) + wind )))      
 }
 
 object SimulationFrame {
@@ -61,8 +64,8 @@ object SimulationFrame {
   /** Generates boids in the centre of the simulation, moving at v=1 in a random direction */
   def explosionOfBoids(i:Int):SimulationFrame = {
     val startPos = Vec2(SimulationController.width/2, SimulationController.height/2)
-    println(SimulationFrame(Seq.fill(i)(Boid(startPos, Vec2.randomDir(1)))))
     SimulationFrame(Seq.fill(i)(Boid(startPos, Vec2.randomDir(1))))
+    
   }  
 
 

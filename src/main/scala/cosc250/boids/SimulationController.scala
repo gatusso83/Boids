@@ -15,7 +15,7 @@ object SimulationController {
   val frameMemoryLength = 60
 
   /** How many boids to start with in the simulation */
-  val numBoids = 2//150
+  val numBoids = 100
 
   /** When the wind is blowing, how strongly it blows */
   val windStrength = 0.03
@@ -56,6 +56,7 @@ object SimulationController {
   /** The current frame */
   def current:SimulationFrame = {
     frameMemory.currentFrame
+    
   }
   
   /** Called by a click to the canvas, to say that in the next frame, a boid should be inserted */
@@ -74,11 +75,11 @@ object SimulationController {
   def update():Unit = {    
     SimulationController.pushFrame(current.nextFrame(wind,oneTimeFunction))
     resetOneTimeEvents()
-    wind = None
   }
 
   /** Force the simulation to use this as the next frame */
   def pushFrame(frame:SimulationFrame):Unit = {
     frameMemory = frameMemory.pushFrame(frame)
+    
   }
 }

@@ -17,13 +17,18 @@ case class Boid(
     */
   def separate(others:Seq[Boid]):Vec2 = { // This one is somewhat done
     val othersClose = others.closeTo(this.position, Boid.desiredSeparation) 
-    val seqDiff = othersClose.map(boid => ((this.position - boid.position).normalised/(this.position - boid.position).magnitude)).foldLeft(Vec2(0,0)){(a, b) => (a + b)} // I think b is then end
-    val seekVal = seek(seqDiff /(othersClose.length))
+    val seqDiff = othersClose.map(boid => (((this.position - boid.position).normalised)/((this.position - boid.position).magnitude))).foldLeft(Vec2(0,0)){(a, b) => (a + b)}
+    val seekVal = seqDiff /(othersClose.length - 1)
 
-    if seekVal.magnitude > 0 then
-      (seekVal.normalised * Boid.maxSpeed - this.velocity).limit(Boid.maxForce) * -1
+    //val seekVal = seek(seqDiff /(othersClose.length))
+    if othersClose.length > 1 then
+      if (seekVal.magnitude > 0) {
+        (seekVal.normalised * Boid.maxSpeed - this.velocity).limit(Boid.maxForce) * -2.5
+      }
+      else {
+        seekVal * -2.5 }
     else
-      seekVal * -10
+      Vec2(0,0)
   }
 
   /**
@@ -33,9 +38,8 @@ case class Boid(
     */
   def align(others:Seq[Boid]):Vec2 = { // Complete....
     val othersClose = others.closeTo(this.position, Boid.neighBourDist)
-    if (!othersClose.isEmpty) {
-      val avgVel = othersClose.averageVelocity.limit(Boid.maxSpeed)
-      seek(avgVel - this.velocity).limit(Boid.maxForce)
+    if (othersClose.length > 1) {
+      (othersClose.averageVelocity * Boid.maxSpeed).limit(Boid.maxForce)
     }
     else {
       Vec2(0,0)
@@ -48,7 +52,7 @@ case class Boid(
     */
   def seek(targetPos:Vec2):Vec2 = { // Seek is done
     val desired = targetPos - this.position
-    (desired.normalised * Boid.maxSpeed - this.velocity).limit(Boid.maxForce)
+    ((desired.normalised * Boid.maxSpeed) - this.velocity).limit(Boid.maxForce)
   }
 
 
@@ -58,10 +62,14 @@ case class Boid(
     */
   def cohesion(others:Seq[Boid]):Vec2 = {
     val othersClose = others.closeTo(this.position, Boid.neighBourDist)
-    if (!othersClose.isEmpty) then
-      othersClose.averageVelocity
-    else
+    if (othersClose.length > 1) {
+
+      val cent = othersClose.centroid/othersClose.length
+      seek(cent)}//.limit(Boid.maxForce)*0.000000001
+      //othersClose.averageVelocity
+    else{
       Vec2(0,0) 
+    }
   }
 
 
@@ -70,7 +78,7 @@ case class Boid(
     * align, and cohesion acceleration vectors.
     */
   def flock(others:Seq[Boid]):Vec2 = {
-    val acceleration = separate(others) + cohesion(others) + align(others)
+    val acceleration = cohesion(others) + align(others) - separate(others)
       acceleration
   }
 
@@ -126,8 +134,9 @@ object Boid {
   val startleStrength:Double = Boid.maxSpeed
 
   /** A function that will "startle" a boid */
-  def startleFunction(b:Boid):Vec2 = ???
-
+  def startleFunction(b:Boid):Vec2 = 
+    Vec2.randomDir(startleStrength)
+    
 }
 
 /*
@@ -140,7 +149,7 @@ extension (boids:Seq[Boid]) {
     * align, separate, and cohesion all want to consider boids within a certain range.
     */
   def closeTo(p:Vec2, d:Double):Seq[Boid] = 
-    boids.filter(boid => Math.abs((boid.position - p).magnitude) < d)
+    boids.filter(boid => (Math.abs((boid.position - p).magnitude) < d && Math.abs((boid.position - p).magnitude) > 0.000000002))
 
     // This should take the positions of each boid, determine if any are within the "desiredSeparation" 
 
