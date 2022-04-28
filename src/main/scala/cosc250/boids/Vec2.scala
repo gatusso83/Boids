@@ -111,7 +111,5 @@ object Vec2 {
   val NW:Double = 5 * Math.PI / 4
   val N:Double = 3 * Math.PI / 2
   val NE:Double = 7 * Math.PI / 4
-
-
 }
 

@@ -28,10 +28,10 @@ class BoidSuite extends munit.FunSuite {
   }
 
   test("Seq[boid] should be able to calculate separation acceleration") {
-    assertEquals(boid.separate(testBoids), Vec2(2,2))
+    assertEquals(boid.separate(testBoids), Vec2(0.05303300858899106,0.05303300858899107))
   }
   
   test("Seq[boid] should be able to calculate an align acceleration") {
-    assertEquals(boid.align(testBoids), Vec2(2,2))
+    assertEquals(boid.align(testBoids), Vec2(0.02121320343559643,0.02121320343559642))
   }
 }

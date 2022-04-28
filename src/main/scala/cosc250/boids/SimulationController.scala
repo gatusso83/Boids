@@ -15,8 +15,7 @@ object SimulationController {
   val frameMemoryLength = 60
 
   /** How many boids to start with in the simulation */
-  val numBoids = 100
-
+  val numBoids = 150
   /** When the wind is blowing, how strongly it blows */
   val windStrength = 0.03
 

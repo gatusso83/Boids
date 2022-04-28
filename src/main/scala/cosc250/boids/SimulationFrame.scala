@@ -1,4 +1,5 @@
 package cosc250.boids
+import scala.math.BigDecimal
 
 /**
   * Represents the state in our simulation.
@@ -10,11 +11,11 @@ case class SimulationFrame(boids:Seq[Boid]) {
 
   /** The current average direction of the flock. Add up all the boids' velocity vectors, and take the theta. */
   def flockDir:Double =
-    boids.averageVelocity.theta.round
+    BigDecimal(boids.averageVelocity.theta).setScale(3,BigDecimal.RoundingMode.HALF_UP).toDouble
 
   /** The current average speed of the flock. Take the mean of all the boids' velocity magnitudes. */
   def flockSpeed:Double =
-    boids.averageVelocity.magnitude.round
+    BigDecimal(boids.averageVelocity.magnitude).setScale(3,BigDecimal.RoundingMode.HALF_UP).toDouble
     
 
   /**
@@ -29,13 +30,11 @@ case class SimulationFrame(boids:Seq[Boid]) {
     * on the screen looks right!
     */
   def flockSep:Double = {
-    val cent = boids.foldLeft(Vec2(0,0)){(acc, boidPos) =>
-      acc + boidPos.position}/boids.length
-      
+    val cent = boids.foldLeft(Vec2(0,0)){(acc, boidPos) => acc + boidPos.position}/boids.length
     val squareDist = boids.map(boid => Math.pow((boid.position - cent).magnitude,2))
     val res = squareDist.foldLeft(0.0){((a,b) => a + b)}/squareDist.length
-    res.round
-    }
+    BigDecimal(res).setScale(3,BigDecimal.RoundingMode.HALF_UP).toDouble
+  }
   
 
   /** This function should calculate the next set of boids assuming there is no wind & no one-time functions applied */
@@ -43,7 +42,7 @@ case class SimulationFrame(boids:Seq[Boid]) {
     boids.map(boid => SimulationController.wind match
       case None => (boid.update(boid.flock(boids), Vec2(0,0)))
       case Some(wind) => boid.update(boid.flock(boids), SimulationController.wind.get))
-    }
+  }
       
   /**
     *
@@ -56,7 +55,7 @@ case class SimulationFrame(boids:Seq[Boid]) {
       case (None, None) => SimulationFrame(nextBoids)
       case (Some(wind), None) => SimulationFrame(nextBoids.map(boid => Boid(boid.position, boid.velocity + wind)))
       case (None, Some(oneTimeFunction)) => SimulationFrame(nextBoids.map(boid => Boid(boid.position, boid.velocity + oneTimeFunction(boid))))  
-      case (Some(wind), Some(oneTimeFunction)) => SimulationFrame(nextBoids.map(boid => Boid(boid.position, boid.velocity + oneTimeFunction(boid) + wind )))      
+      case (Some(wind), Some(oneTimeFunction)) => SimulationFrame(nextBoids.map(boid => Boid(boid.position, boid.velocity + wind + oneTimeFunction(boid) )))      
 }
 
 object SimulationFrame {
@@ -65,8 +64,6 @@ object SimulationFrame {
   def explosionOfBoids(i:Int):SimulationFrame = {
     val startPos = Vec2(SimulationController.width/2, SimulationController.height/2)
     SimulationFrame(Seq.fill(i)(Boid(startPos, Vec2.randomDir(1))))
-    
   }  
-
 
 }

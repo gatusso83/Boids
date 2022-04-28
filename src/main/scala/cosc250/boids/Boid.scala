@@ -15,18 +15,19 @@ case class Boid(
     * separation from its closest neighbours
     * This steer is limited to maxForce
     */
-  def separate(others:Seq[Boid]):Vec2 = { // This one is somewhat done
+  def separate(others:Seq[Boid]):Vec2 = {
     val othersClose = others.closeTo(this.position, Boid.desiredSeparation) 
-    val seqDiff = othersClose.map(boid => (((this.position - boid.position).normalised)/((this.position - boid.position).magnitude))).foldLeft(Vec2(0,0)){(a, b) => (a + b)}
-    val seekVal = seqDiff /(othersClose.length - 1)
+    val seqDistDiff = othersClose.map(boid => (((this.position - boid.position).normalised)/((this.position - boid.position).magnitude)))
+    val sumDistDiff = seqDistDiff.foldLeft(Vec2(0,0)){(a, b) => (a + b)}
+    val seekVal = sumDistDiff / othersClose.length
+    val separateWeight = -2.5 // Arbitrary weighting value to ensure enough repelling force is applied vs. align/cohesion
 
-    //val seekVal = seek(seqDiff /(othersClose.length))
-    if othersClose.length > 1 then
+    if othersClose.length > 0 then
       if (seekVal.magnitude > 0) {
-        (seekVal.normalised * Boid.maxSpeed - this.velocity).limit(Boid.maxForce) * -2.5
+        (seekVal.normalised * Boid.maxSpeed - this.velocity).limit(Boid.maxForce) * separateWeight
+      } else {
+        Vec2(0,0)
       }
-      else {
-        seekVal * -2.5 }
     else
       Vec2(0,0)
   }
@@ -36,10 +37,10 @@ case class Boid(
     * velocity with other birds within Boid.neighbourDist
     * This alignment force is limited to maxForce
     */
-  def align(others:Seq[Boid]):Vec2 = { // Complete....
+  def align(others:Seq[Boid]):Vec2 = {
     val othersClose = others.closeTo(this.position, Boid.neighBourDist)
-    if (othersClose.length > 1) {
-      (othersClose.averageVelocity * Boid.maxSpeed).limit(Boid.maxForce)
+    if (othersClose.length > 0) {
+       ((othersClose.averageVelocity.normalised * Boid.maxSpeed) - this.velocity).limit(Boid.maxForce)
     }
     else {
       Vec2(0,0)
@@ -50,9 +51,9 @@ case class Boid(
     * Calculates an acceleration that will steer this boid towards the target.
     * The steer is limited to maxForce
     */
-  def seek(targetPos:Vec2):Vec2 = { // Seek is done
-    val desired = targetPos - this.position
-    ((desired.normalised * Boid.maxSpeed) - this.velocity).limit(Boid.maxForce)
+  def seek(targetPos:Vec2):Vec2 = { 
+    val desiredPos = targetPos - this.position
+    ((desiredPos.normalised * Boid.maxSpeed) - this.velocity).limit(Boid.maxForce)
   }
 
 
@@ -62,12 +63,10 @@ case class Boid(
     */
   def cohesion(others:Seq[Boid]):Vec2 = {
     val othersClose = others.closeTo(this.position, Boid.neighBourDist)
-    if (othersClose.length > 1) {
-
-      val cent = othersClose.centroid/othersClose.length
-      seek(cent)}//.limit(Boid.maxForce)*0.000000001
-      //othersClose.averageVelocity
-    else{
+    if (othersClose.length > 0) {
+      val cent = othersClose.centroid
+      seek(cent)
+    } else {
       Vec2(0,0) 
     }
   }
@@ -78,8 +77,7 @@ case class Boid(
     * align, and cohesion acceleration vectors.
     */
   def flock(others:Seq[Boid]):Vec2 = {
-    val acceleration = cohesion(others) + align(others) - separate(others)
-      acceleration
+    cohesion(others) + align(others) - separate(others)
   }
 
   /**
@@ -135,8 +133,7 @@ object Boid {
 
   /** A function that will "startle" a boid */
   def startleFunction(b:Boid):Vec2 = 
-    Vec2.randomDir(startleStrength)
-    
+    Vec2.randomDir(startleStrength)  
 }
 
 /*
@@ -149,7 +146,7 @@ extension (boids:Seq[Boid]) {
     * align, separate, and cohesion all want to consider boids within a certain range.
     */
   def closeTo(p:Vec2, d:Double):Seq[Boid] = 
-    boids.filter(boid => (Math.abs((boid.position - p).magnitude) < d && Math.abs((boid.position - p).magnitude) > 0.000000002))
+    boids.filter(boid => (boid.position - p).magnitude < d && (boid.position - p).magnitude > 0)
 
     // This should take the positions of each boid, determine if any are within the "desiredSeparation" 
 
@@ -158,8 +155,7 @@ extension (boids:Seq[Boid]) {
     * Cohesion asks a boid to steer towards the centroid of the boids within a certain distance
     */
   def centroid:Vec2 =
-    boids.foldLeft(Vec2(0,0)){(acc, boidPos) =>
-      acc + boidPos.position}/boids.length
+    boids.foldLeft(Vec2(0,0)){(acc, boidPos) => acc + boidPos.position} / boids.length
 
     //boids.foldLeft(boids(0).position){(acc, boidPos) =>
       //acc + boidPos.position}/boids.length
@@ -169,7 +165,6 @@ extension (boids:Seq[Boid]) {
     * Align asks a boid to steer so it will align more with its neighbours' average velocity vector
     */
   def averageVelocity:Vec2 =
-    boids.foldLeft(Vec2(0,0)){(acc, boidVel) =>
-      acc + boidVel.velocity}/boids.length
-
-}
+    boids.foldLeft(Vec2(0,0)){(acc, boidVel) => acc + boidVel.velocity} / boids.length
+  
+  }
